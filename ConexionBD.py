@@ -1,0 +1,53 @@
+from pymongo import MongoClient
+import base64, glob, os
+
+class ConexionBD(object):
+    __instancia = None
+    credenciales = 'mongodb://carloslrsa:carloslrsa1@ds145113.mlab.com:45113/safe_home'
+    direccionFotos = 'bd_local/fotos/'
+    direccionDataset = 'bd_local/dataset/'
+    direccionBd = 'bd_local/bd.txt'
+
+    def __new__(cls):
+        if ConexionBD.__instancia is None :
+            ConexionBD.__instancia = object.__new__(cls)
+        return ConexionBD.__instancia	
+
+    def __init__(self):
+        self.cliente = MongoClient(ConexionBD.credenciales)
+        self.bd = self.cliente['safe_home']
+
+
+    def ObtenerFotos(self):
+        coleccionFotos = self.bd['fotos']
+        cursor = coleccionFotos.find({})
+
+        i = 0
+        
+        archivoBd = open(ConexionBD.direccionBd, 'w')
+        
+        self.eliminar_fotos()
+        
+        for documento in cursor:
+            j = 0
+            fotos = documento['fotos']
+            
+            archivoBd.write(documento['_id'] + '\n')
+            for fotoBase64 in fotos:
+                fotoActual = base64.b64decode(fotoBase64)
+                nombreArchivo = ConexionBD.direccionFotos + str(i) + '-' + str(j) + '.jpg'
+
+                with open(nombreArchivo, 'wb') as archivo:
+                    archivo.write(fotoActual)
+                j = j + 1
+            i = i + 1
+                    
+    def eliminar_fotos(self):
+        fotos = glob.glob(ConexionBD.direccionFotos + '*')
+        dataset = glob.glob(ConexionBD.direccionDataset + '*')
+        
+        for foto in fotos:
+            os.remove(foto)
+            
+        for data in dataset:
+            os.remove(data)
