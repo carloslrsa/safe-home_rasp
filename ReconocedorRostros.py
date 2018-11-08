@@ -27,8 +27,10 @@ class ReconocedorRostros(object):
         self.Realimentar()
     
     def Reconocer(self):
-        threading.Thread(target = self.analizar_video()).start()
-        threading.Thread(target = self.verificar_cambios_habitantes()).start()
+        threading.Thread(target = self.analizar_video).start()
+        print('Analisis empezado')
+        threading.Thread(target = self.verificar_cambios_habitantes).start()
+        print('Verificacion empezado')
 
     def Realimentar(self):
         print ('Alimentando al entrenador...')
@@ -77,24 +79,26 @@ class ReconocedorRostros(object):
 
         fotos = []
         labels = []
+        self.cambiandoTrainer = True
 
         for direccion_foto in direcciones_fotos:
             foto_pil = Image.open(direccion_foto).convert('L')
             foto = numpy.array(foto_pil, 'uint8')
             label = int(split(direccion_foto)[1].split('-')[0])
-
+            
             rostros = self.clasificador_rostro.detectMultiScale(foto)
-
             for (x, y, w, h) in rostros:
                 fotos.append(foto[y: y + h, x: x + w])
                 labels.append(label)
-        
+                break;
 
-        self.cambiandoTrainer = True
+
+
 
         self.reconocedor.train(fotos, numpy.array(labels))
         self.reconocedor.save('trainer/trainer.yml')
-        self.reconocedor.read('trainer/trainer.yml')
+        #self.reconocedor.read('trainer/trainer.yml')
+        
         self.info_habitantes = self.info_habitantes_buffer
 
         self.cambiandoTrainer = False
@@ -104,7 +108,7 @@ class ReconocedorRostros(object):
         while True:
             ret, imagen = self.camara.read()
             imagen_grises = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
-            if ReconocedorRostros.cambiandoTrainer == False:
+            if self.cambiandoTrainer == False:
                 rostros = self.clasificador_rostro.detectMultiScale(imagen_grises, scaleFactor=1.2, minNeighbors=5, minSize=(50, 50), flags=cv2.CASCADE_SCALE_IMAGE)
                 for(x, y, w, h) in rostros:
                     label, conf = self.reconocedor.predict(imagen_grises[y : y + h, x : x + w])
@@ -112,7 +116,7 @@ class ReconocedorRostros(object):
 
                     num = 0
                     encontrado = False
-
+                    
                     for info_habitante in self.info_habitantes:
                         if (num == label and conf < 80):
                             label = info_habitante
@@ -123,14 +127,14 @@ class ReconocedorRostros(object):
 
                     cv2.putText(imagen, label + '--' + str(conf), (x, y + h), self.fuente, 1, (255, 255, 255), 2, cv2.LINE_AA)
             ret_1, jpeg = cv2.imencode('.jpg', imagen)
-            self.foto_actual = jpeg.tobytes()  
+            self.foto_actual = jpeg.tobytes()
 
 
     def verificar_cambios_habitantes(self):
         while True:
             sistema = ConexionBD().ObtenerVariablesSistema()
             if sistema['cambiosHabitantes'] == True:
-                reconocedor.Realimentar()
+                self.Realimentar()
                 ConexionBD().NotificarCambioHabitante(sistema, False)
 
     def obtener_fotografia(self):
