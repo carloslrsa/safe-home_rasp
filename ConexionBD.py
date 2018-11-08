@@ -17,7 +17,6 @@ class ConexionBD(object):
         self.cliente = MongoClient(ConexionBD.credenciales)
         self.bd = self.cliente['safe_home']
 
-
     def ObtenerFotos(self):
         coleccionFotos = self.bd['fotos']
         cursor = coleccionFotos.find({})
@@ -41,6 +40,17 @@ class ConexionBD(object):
                     archivo.write(fotoActual)
                 j = j + 1
             i = i + 1
+
+    def ObtenerVariablesSistema(self):
+    	coleccionSistema = self.bd['sistema']
+    	cursor = coleccionSistema.find({})
+
+    	for documento in cursor:
+    		sistema = documento
+    		break
+
+    	return sistema
+
                     
     def eliminar_fotos(self):
         fotos = glob.glob(ConexionBD.direccionFotos + '*')

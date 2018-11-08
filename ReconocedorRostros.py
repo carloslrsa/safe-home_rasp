@@ -23,15 +23,21 @@ class ReconocedorRostros(object):
         self.fuente = cv2.FONT_HERSHEY_SIMPLEX
         
         print ('Inicializando...')
-        print ('Alimentando al entrenador...')
-        self.entrenando = True
-        self.alimentar()
-        print ('Entrenando...')
-        self.entrenar()
-        print ('Entrenamiento terminado, listo para reconocer')
+        self.Realimentar()
     
     def Reconocer(self):
         self.analizar_fotografia()
+
+    def Realimentar(self):
+        print ('Alimentando al entrenador...')
+        self.entrenando = True
+        self.alimentar()
+        print ('Alimentación terminada.')
+        print ('Empezando entrenamiento...')
+        self.entrenar()
+        print ('Entrenamiento terminado, listo para reconocer')
+        self.entrenando = False
+    
 
     def alimentar(self):
         detector=cv2.CascadeClassifier('classifiers/face.xml')
@@ -86,7 +92,6 @@ class ReconocedorRostros(object):
         self.reconocedor.train(fotos, numpy.array(labels))
         self.reconocedor.save('trainer/trainer.yml')
         self.reconocedor.read('trainer/trainer.yml')
-        self.entrenando = False
 
     def analizar_fotografia(self):
         while True:
