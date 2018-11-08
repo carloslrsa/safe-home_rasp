@@ -32,7 +32,7 @@ class ReconocedorRostros(object):
         print ('Alimentando al entrenador...')
         self.entrenando = True
         self.alimentar()
-        print ('Alimentación terminada.')
+        print ('Alimentacion terminada.')
         print ('Empezando entrenamiento...')
         self.entrenar()
         print ('Entrenamiento terminado, listo para reconocer')

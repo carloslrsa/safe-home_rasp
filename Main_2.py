@@ -1,5 +1,6 @@
 from flask import Flask, render_template, Response
 from ReconocedorRostros import ReconocedorRostros
+from ConexionBD import ConexionBD
 import threading
 
 app = Flask(__name__)
@@ -20,15 +21,17 @@ def video_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 def metodo_principal():
-    sistema = ConexionBD().ObtenerVariablesSistema()
-    if sistema['cambiosHabitantes'] == True:
-        reconocedor.Realimentar()
+    while True:
+        sistema = ConexionBD().ObtenerVariablesSistema()
+        if sistema['cambiosHabitantes'] == True:
+            reconocedor.Realimentar()
+            ConexionBD().NotificarCambioHabitante(sistema, False)
 
 if __name__ == '__main__':
     
     reconocedor = ReconocedorRostros()
     threading.Thread(target = reconocedor.Reconocer).start()
+    threading.Thread(target = metodo_principal).start()
     threading.Thread(app.run(host='192.168.1.13', threaded = True, debug=False)).start()
 
-    threading.Thread(target = metodo_principal).start()
     

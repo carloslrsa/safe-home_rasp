@@ -51,6 +51,11 @@ class ConexionBD(object):
 
     	return sistema
 
+    def NotificarCambioHabitante(self, sistema, cambio):
+        colleccionSistema = self.bd['sistema']
+        colleccionSistema.find_one_and_update({"_id": sistema['_id']},
+                                                              {"$set": {
+                                                                  "cambiosHabitantes" : cambio}})
                     
     def eliminar_fotos(self):
         fotos = glob.glob(ConexionBD.direccionFotos + '*')
