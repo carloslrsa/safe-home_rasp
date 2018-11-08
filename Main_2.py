@@ -20,18 +20,12 @@ def video_feed():
     return Response(gen(reconocedor),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
-def metodo_principal():
-    while True:
-        sistema = ConexionBD().ObtenerVariablesSistema()
-        if sistema['cambiosHabitantes'] == True:
-            reconocedor.Realimentar()
-            ConexionBD().NotificarCambioHabitante(sistema, False)
-
 if __name__ == '__main__':
     
     reconocedor = ReconocedorRostros()
-    threading.Thread(target = reconocedor.Reconocer).start()
-    threading.Thread(target = metodo_principal).start()
+    
+    reconocedor.Reconocer()
+
     threading.Thread(app.run(host='192.168.1.13', threaded = True, debug=False)).start()
 
     
