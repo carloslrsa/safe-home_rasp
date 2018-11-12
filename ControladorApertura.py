@@ -24,5 +24,9 @@ class ControladorApertura(object):
     def senal(self):
         self.pwm.start(self.ciclo)
 
+    def VerificarSolicitudApertura(self, ):
+        
+    def verificarSolicitudLocal(self, ):
 
-ControladorApertura()
+    def verificarSolicitudRemota(self, ):
+    
