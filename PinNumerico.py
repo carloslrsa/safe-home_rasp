@@ -36,7 +36,7 @@ class PinNumerico(object):
         self.tiempo_pasado = 0
         self.tiempo_refresco = 2000
         self.lectura = ''
-        #threading.Thread(target = self.rutina_leer).start()
+        threading.Thread(target = self.rutina_leer).start()
     
     def Leer(self):
         return self.lectura
@@ -52,7 +52,7 @@ class PinNumerico(object):
                     
                     self.tiempo_pasado = 0
                     
-                    print 'lectura: ' + self.lectura
+                    #print 'lectura: ' + self.lectura
                     
                     while GPIO.input(self.FILAS[i]) == 0:
                         pass
@@ -62,7 +62,7 @@ class PinNumerico(object):
         #print self.tiempo_pasado
         if self.tiempo_pasado > self.tiempo_refresco:
             self.tiempo_pasado = 0
-            print 'Se limpio la lectura'
+            #print 'Se limpio la lectura'
             self.lectura = ''
     
     def rutina_leer(self):
