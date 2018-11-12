@@ -26,7 +26,7 @@ if __name__ == '__main__':
     
     reconocedor.Reconocer()
     
-    threading.Thread(target = app.run(host='192.168.1.13', threaded = True, debug=False)).start()
+    threading.Thread(target = app.run(host='192.168.43.18', threaded = True, debug=False)).start()
 
 
 

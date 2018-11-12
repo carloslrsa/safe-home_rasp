@@ -97,7 +97,7 @@ class ReconocedorRostros(object):
 
         self.reconocedor.train(fotos, numpy.array(labels))
         self.reconocedor.save('trainer/trainer.yml')
-        #self.reconocedor.read('trainer/trainer.yml')
+        self.reconocedor.read('trainer/trainer.yml')
         
         self.info_habitantes = self.info_habitantes_buffer
 
