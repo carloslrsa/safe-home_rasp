@@ -1,6 +1,5 @@
 import RPi.GPIO as GPIO
 import threading
-import time
 
 from ConexionBD import ConexionBD
 
@@ -14,7 +13,7 @@ class ControladorApertura(object):
 
     def __init__(self):
         self.teclado = PinNumerico()
-        self.cerradura = Cerradura()
+        #self.cerradura = Cerradura()
 
     def VerificarSolicitudApertura(self, rostros):
     	self.verificarSolicitudLocal(rostros)
@@ -23,12 +22,12 @@ class ControladorApertura(object):
     def verificarSolicitudLocal(self, rostros):
         for rostro in rostros:
             if rostro[2] == self.teclado.Leer():
-                self.cerradura.Abrir()
+                print 'Cerradura abierta'
                 break
     def verificarSolicitudRemota(self):
     	sistema = ConexionBD().ObtenerVariablesSistema()
         if sistema['instruccionCerradura'] == True:
-            self.cerradura.Abrir()
+            print 'Cerradura abierta'
             ConexionBD().NotificarCambioApertura(sistema, False)
 
 class PinNumerico():
@@ -40,8 +39,8 @@ class PinNumerico():
         ["*",0,"#"]
     ]
 
-    FILAS         = [25,24,23,18]
-    COLUMNAS      = [27,17,4]
+    FILAS         = [18,23,24,25]
+    COLUMNAS      = [4,17,22]
 
     def __init__(self):
         GPIO.setmode(GPIO.BCM)
@@ -92,43 +91,21 @@ class PinNumerico():
             
 class Cerradura():
 
-    abierto = False
-
-
     def __init__(self):
-        #GPIO.setmode(GPIO.BOARD)
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(22,GPIO.OUT)
+        GPIO.setup(27,GPIO.OUT)
         #se crea el objeto en el pin 11 con 50 Hz
-        self.pwm = GPIO.PWM(22,50)
-
-        #self.anchoPulso = 0.0014
-        #self.ciclo = self.anchoPulso * 50 * 100 # %
-
-        self.ciclo = [7.5,4.5]
-        self.pwm.start(self.ciclo[1])
-        time.sleep(0.5)
-        self.pwm.ChangeDutyCycle(0)
-
+        self.pwm = GPIO.PWM(27,50)
+        self.Abrir()
+        self.senal()
 
     def Abrir(self):
-        if self.abierto == False:
-            self.abierto = True
-            self.pwm.ChangeDutyCycle(self.ciclo[0])
-            time.sleep(.5)
-            self.pwm.ChangeDutyCycle(self.ciclo[1])
-            time.sleep(.5)
-            self.pwm.ChangeDutyCycle(0)
-            self.abierto = False
-        #self.Abrir()
-        #self.senal()
-
-    #def Abrir(self):
         #prueba : 1.4 milisegundos --> 0.0018 seg
-        #self.anchoPulso = 0.0014
-        #self.ciclo = self.anchoPulso * 50 * 100 # %
+        self.anchoPulso = 0.0014
+        self.ciclo = self.anchoPulso * 50 * 100 # %
 
-    #def senal(self):
-    #    self.pwm.start(self.ciclo)
+    def senal(self):
+        self.pwm.start(self.ciclo)
+        self.senal()
 
     #def Abrir(self):
