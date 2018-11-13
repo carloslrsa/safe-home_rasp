@@ -1,4 +1,7 @@
 import RPi.GPIO as GPIO
+import threading
+
+from ConexionBD import ConexionBD
 
 class ControladorApertura(object):
     __instancia = None
@@ -10,25 +13,22 @@ class ControladorApertura(object):
 
     def __init__(self):
         self.teclado = PinNumerico()
-        self.cerradura = Cerradura()
+        #self.cerradura = Cerradura()
 
     def VerificarSolicitudApertura(self, rostros):
     	self.verificarSolicitudLocal(rostros)
         self.verificarSolicitudRemota()
 
     def verificarSolicitudLocal(self, rostros):
-		for rostro in rostros:
-			print 'Rostro: ' + rostro
-			print self.teclado.Leer()
-			if rostro.pinPersona == self.teclado.Leer():
-				print 'Cerradura abierta'
-				break
-
+        for rostro in rostros:
+            if rostro[2] == self.teclado.Leer():
+                print 'Cerradura abierta'
+                break
     def verificarSolicitudRemota(self):
     	sistema = ConexionBD().ObtenerVariablesSistema()
-            if sistema['instruccionCerradura'] == True:
-                print 'Cerradura abierta'
-                ConexionBD().NotificarCambioApertura(sistema, False)
+        if sistema['instruccionCerradura'] == True:
+            print 'Cerradura abierta'
+            ConexionBD().NotificarCambioApertura(sistema, False)
 
 class PinNumerico():
 
@@ -88,3 +88,24 @@ class PinNumerico():
     def rutina_leer(self):
         while True:
             self.obtener_tecla()
+            
+class Cerradura():
+
+    def __init__(self):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(11,GPIO.OUT)
+        #se crea el objeto en el pin 11 con 50 Hz
+        self.pwm = GPIO.PWM(11,50)
+        self.Abrir()
+        self.senal()
+
+    def Abrir(self):
+        #prueba : 1.4 milisegundos --> 0.0018 seg
+        self.anchoPulso = 0.0014
+        self.ciclo = self.anchoPulso * 50 * 100 # %
+
+    def senal(self):
+        self.pwm.start(self.ciclo)
+        self.senal()
+
+    #def Abrir(self):

@@ -1,5 +1,6 @@
 from flask import Flask, render_template, Response
 from ReconocedorRostros import ReconocedorRostros
+from ControladorApertura import ControladorApertura
 import threading
 
 app = Flask(__name__)
@@ -10,7 +11,7 @@ def index():
 
 def gen(reconocedor):
     while True:
-        frame = reconocedor.obtener_fotografia()
+        frame = reconocedor.ObtenerFotografia()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
@@ -24,13 +25,19 @@ def grabar():
         camara.get_frame()
         print "frame"
 
+def prueba():
+    controladorApertura = ControladorApertura()
+    while True:
+        controladorApertura.VerificarSolicitudApertura(reconocedor.ObtenerRostros())
+
 if __name__ == '__main__':
     
     reconocedor = ReconocedorRostros()
-    controladorApertura = ControladorApertura()
+    threading.Thread(target = prueba).start()
+    threading.Thread(app.run(host='192.168.1.13', threaded = True, debug=False)).start()
 
-    while True:
-        controladorApertura.VerificarSolicitudApertura(reconocedor.ObtenerRostros)
+
+        
 
 
     #threading.Thread(app.run(host='192.168.1.13', threaded = True, debug=False)).start()

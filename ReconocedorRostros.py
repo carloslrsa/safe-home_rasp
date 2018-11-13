@@ -14,6 +14,9 @@ class ReconocedorRostros(object):
         return ReconocedorRostros.__instancia
 
     def __init__(self):
+        
+        self.rostrosReconocidos = []
+        
         self.reconocedor = cv2.face.LBPHFaceRecognizer_create()
         self.reconocedor.read('trainer/trainer.yml')
 
@@ -23,10 +26,10 @@ class ReconocedorRostros(object):
         self.camara = cv2.VideoCapture(0)
         self.fuente = cv2.FONT_HERSHEY_SIMPLEX
 
-        self.rostrosReconocidos = []
-        
         print ('Inicializando...')
-        self.verificarCambiosHabitantes()
+        
+        self.realimentar()
+        
         threading.Thread(target = self.reconocer).start()
         print('Analisis empezado')
         threading.Thread(target = self.verificarCambiosHabitantes).start()
@@ -71,11 +74,12 @@ class ReconocedorRostros(object):
                 numero_habitante = numero_habitante + 1
 
         bd = open('bd_local/bd.txt')
-        self.lineas = [linea.rstrip('\n') for linea in bd]
-        self.info_habitantes_buffer = [,]
+        lineas = [linea.rstrip('\n') for linea in bd]
+        print lineas
+        self.info_habitantes_buffer = []
 
         for linea in lineas:
-            self.info_habitantes_buffer.append([espacio.rstrip('|') for espacio in linea])
+            self.info_habitantes_buffer.append(linea.split("|"))
 
     def entrenar(self):
         direccion_dataset = "bd_local/dataset"
@@ -101,6 +105,7 @@ class ReconocedorRostros(object):
         self.reconocedor.read('trainer/trainer.yml')
         
         self.info_habitantes = self.info_habitantes_buffer
+        print self.info_habitantes
 
         self.cambiandoTrainer = False
 
@@ -131,7 +136,9 @@ class ReconocedorRostros(object):
                     if encontrado == False:
                         label = 'Desconocido'
 
-                    self.rostrosReconocidos.append(Rostro(encontrado, label, pin))
+                    self.rostrosReconocidos.append([encontrado, label, pin])
+                    
+                    #print self.rostrosReconocidos
 
                     cv2.putText(imagen, label + '--' + str(conf), (x, y + h), self.fuente, 1, (255, 255, 255), 2, cv2.LINE_AA)
             ret_1, jpeg = cv2.imencode('.jpg', imagen)
@@ -149,10 +156,3 @@ class ReconocedorRostros(object):
 
     def ObtenerRostros(self):
         return self.rostrosReconocidos
-
-
-class Rostro():
-    def __init__(self, esConocido, correoPersona, pinPersona):
-        self.esConocido = esConocido;
-        self.correoPersona = correoPersona;
-        self.pinPersona = pinPersona;
