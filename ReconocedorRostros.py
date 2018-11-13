@@ -22,17 +22,17 @@ class ReconocedorRostros(object):
 
         self.camara = cv2.VideoCapture(0)
         self.fuente = cv2.FONT_HERSHEY_SIMPLEX
+
+        self.rostrosReconocidos = []
         
         print ('Inicializando...')
-        self.Realimentar()
-    
-    def Reconocer(self):
-        threading.Thread(target = self.analizar_video).start()
+        self.verificarCambiosHabitantes()
+        threading.Thread(target = self.reconocer).start()
         print('Analisis empezado')
-        threading.Thread(target = self.verificar_cambios_habitantes).start()
+        threading.Thread(target = self.verificarCambiosHabitantes).start()
         print('Verificacion empezado')
 
-    def Realimentar(self):
+    def realimentar(self):
         print ('Alimentando al entrenador...')
         self.alimentar()
         print ('Alimentacion terminada.')
@@ -71,7 +71,11 @@ class ReconocedorRostros(object):
                 numero_habitante = numero_habitante + 1
 
         bd = open('bd_local/bd.txt')
-        self.info_habitantes_buffer = [linea.rstrip('\n') for linea in bd]
+        self.lineas = [linea.rstrip('\n') for linea in bd]
+        self.info_habitantes_buffer = [,]
+
+        for linea in lineas:
+            self.info_habitantes_buffer.append([espacio.rstrip('|') for espacio in linea])
 
     def entrenar(self):
         direccion_dataset = "bd_local/dataset"
@@ -92,9 +96,6 @@ class ReconocedorRostros(object):
                 labels.append(label)
                 break;
 
-
-
-
         self.reconocedor.train(fotos, numpy.array(labels))
         self.reconocedor.save('trainer/trainer.yml')
         self.reconocedor.read('trainer/trainer.yml')
@@ -104,38 +105,54 @@ class ReconocedorRostros(object):
         self.cambiandoTrainer = False
 
 
-    def analizar_video(self):
+    def reconocer(self):
         while True:
             ret, imagen = self.camara.read()
             imagen_grises = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
             if self.cambiandoTrainer == False:
                 rostros = self.clasificador_rostro.detectMultiScale(imagen_grises, scaleFactor=1.2, minNeighbors=5, minSize=(50, 50), flags=cv2.CASCADE_SCALE_IMAGE)
+
+                self.rostrosReconocidos = []
+
                 for(x, y, w, h) in rostros:
                     label, conf = self.reconocedor.predict(imagen_grises[y : y + h, x : x + w])
                     cv2.rectangle(imagen, (x - 50, y - 50), (x + w + 50, y + h + 50), (255, 0, 0), 2)
 
                     num = 0
                     encontrado = False
+                    pin = '-'
                     
                     for info_habitante in self.info_habitantes:
                         if (num == label and conf < 80):
-                            label = info_habitante
+                            label = info_habitante[1]
+                            pin = info_habitante[2]
                             encontrado = True
                             break
                     if encontrado == False:
                         label = 'Desconocido'
 
+                    self.rostrosReconocidos.append(Rostro(encontrado, label, pin))
+
                     cv2.putText(imagen, label + '--' + str(conf), (x, y + h), self.fuente, 1, (255, 255, 255), 2, cv2.LINE_AA)
             ret_1, jpeg = cv2.imencode('.jpg', imagen)
             self.foto_actual = jpeg.tobytes()
 
-
-    def verificar_cambios_habitantes(self):
+    def verificarCambiosHabitantes(self):
         while True:
             sistema = ConexionBD().ObtenerVariablesSistema()
             if sistema['cambiosHabitantes'] == True:
-                self.Realimentar()
+                self.realimentar()
                 ConexionBD().NotificarCambioHabitante(sistema, False)
 
-    def obtener_fotografia(self):
+    def ObtenerFotografia(self):
         return self.foto_actual
+
+    def ObtenerRostros(self):
+        return self.rostrosReconocidos
+
+
+class Rostro():
+    def __init__(self, esConocido, correoPersona, pinPersona):
+        self.esConocido = esConocido;
+        self.correoPersona = correoPersona;
+        self.pinPersona = pinPersona;

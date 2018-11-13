@@ -27,7 +27,10 @@ def grabar():
 if __name__ == '__main__':
     
     reconocedor = ReconocedorRostros()
-    threading.Thread(target = reconocedor.Reconocer).start()
-    threading.Thread(app.run(host='192.168.1.13', threaded = True, debug=False)).start()
-    
-print("hola")
+    controladorApertura = ControladorApertura()
+
+    while True:
+        controladorApertura.VerificarSolicitudApertura(reconocedor.ObtenerRostros)
+
+
+    #threading.Thread(app.run(host='192.168.1.13', threaded = True, debug=False)).start()

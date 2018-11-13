@@ -31,7 +31,7 @@ class ConexionBD(object):
             j = 0
             fotos = documento['fotos']
             
-            archivoBd.write(documento['_id'] + '\n')
+            archivoBd.write(documento['_id'] + '|' + documento['nombre'] + '|' + documento['pin'] + '\n')
             for fotoBase64 in fotos:
                 fotoActual = base64.b64decode(fotoBase64)
                 nombreArchivo = ConexionBD.direccionFotos + str(i) + '-' + str(j) + '.jpg'
@@ -56,7 +56,13 @@ class ConexionBD(object):
         colleccionSistema.find_one_and_update({"_id": sistema['_id']},
                                                               {"$set": {
                                                                   "cambiosHabitantes" : cambio}})
-                    
+     
+    def NotificarCambioApertura(self, sistema, cambio):
+    	colleccionSistema = self.bd['sistema']
+        colleccionSistema.find_one_and_update({"_id": sistema['_id']},
+                                                              {"$set": {
+                                                                  "instruccionCerradura" : cambio}})
+
     def eliminar_fotos(self):
         fotos = glob.glob(ConexionBD.direccionFotos + '*')
         dataset = glob.glob(ConexionBD.direccionDataset + '*')
