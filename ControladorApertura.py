@@ -105,7 +105,7 @@ class Cerradura():
         #self.anchoPulso = 0.0014
         #self.ciclo = self.anchoPulso * 50 * 100 # %
 
-        self.ciclo = [7.5,4.5]
+        self.ciclo = [6.5,4.5]
         self.pwm.start(self.ciclo[1])
         time.sleep(0.5)
         self.pwm.ChangeDutyCycle(0)
