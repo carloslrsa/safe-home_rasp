@@ -81,10 +81,7 @@ class ConexionBD(object):
 		self.puedeNotificarRostros = False
 		time.sleep(2)
 		colleccionSistema = self.bd['sistema']
-	    colleccionSistema.find_one_and_update({"_id": "{\"$oid\":\"5bdc0bb9fb6fc074abb59124\"}"},
-	                                                              {"$set": {
-	                                                                  "notificacionRostros" : False,
-	                                                                  "ultimosRostrosReconocidos" : []}})
+	    colleccionSistema.find_one_and_update({"_id": "{\"$oid\":\"5bdc0bb9fb6fc074abb59124\"}"},{"$set":{"notificacionRostros" : False,"ultimosRostrosReconocidos":[]}})
 		self.puedeNotificarRostros = True
 
 
