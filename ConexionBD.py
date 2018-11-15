@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 import base64, glob, os
-import time, threading
+import time, threading, json
 
 class ConexionBD(object):
     __instancia = None
@@ -76,7 +76,7 @@ class ConexionBD(object):
 	        colleccionSistema.find_one_and_update({"_id": sistema['_id']},
 	                                                              {"$set": {
 	                                                                  "notificacionRostros" : True,
-	                                                                  "ultimosRostrosReconocidos" : rostros}})
+	                                                                  "ultimosRostrosReconocidos" : json.dumps(rostros)}})
 
 	        threading.Thread(target = self.rutinaNotificacionRostros, args = (sistema,)).start()
 

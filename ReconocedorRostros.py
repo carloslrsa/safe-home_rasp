@@ -173,5 +173,5 @@ class Rostro():
         self.esConocido = esConocido
         self.pin = pin
 
-    def __str__(self):
+    def __repr__(self):
         return nombre + " " + str(esConocido)
