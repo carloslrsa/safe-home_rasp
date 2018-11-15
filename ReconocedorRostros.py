@@ -126,13 +126,15 @@ class ReconocedorRostros(object):
                     num = 0
                     encontrado = False
                     pin = '-'
-                    
+                    #print 'label inicial: ' + str(label)
+                    #print self.info_habitantes
                     for info_habitante in self.info_habitantes:
-                        if (num == label and conf < 80):
+                        if (num == label and conf < 70):
                             label = info_habitante[1]
                             pin = info_habitante[2]
                             encontrado = True
                             break
+                        num = num + 1
                     if encontrado == False:
                         label = 'Desconocido'
 
