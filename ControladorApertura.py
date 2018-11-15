@@ -21,8 +21,7 @@ class ControladorApertura(object):
         self.verificarSolicitudRemota()
 
     def verificarSolicitudLocal(self, rostros):
-        print rostros
-        print self.teclado.Leer()
+        #print rostros
         for rostro in rostros:
             if rostro[2] == self.teclado.Leer():
                 self.cerradura.Abrir()

@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import base64, glob, os
+import time, threading
 
 class ConexionBD(object):
     __instancia = None
@@ -62,6 +63,30 @@ class ConexionBD(object):
         colleccionSistema.find_one_and_update({"_id": sistema['_id']},
                                                               {"$set": {
                                                                   "instruccionCerradura" : cambio}})
+
+
+
+    puedeNotificarRostros = True
+
+    def NotificarRostrosEncontrados(self, rostros):
+    	if self.puedeNotificarRostros == True:
+	     	colleccionSistema = self.bd['sistema']
+	        colleccionSistema.find_one_and_update({"_id": "{\"$oid\":\"5bdc0bb9fb6fc074abb59124\"}"},
+	                                                              {"$set": {
+	                                                                  "notificacionRostros" : True,
+	                                                                  "ultimosRostrosReconocidos" : rostros}})
+	        threading.Thread(target = rutinaNotificacionRostros).start()
+
+	def rutinaNotificacionRostros(self):
+		self.puedeNotificarRostros = False
+		time.sleep(2)
+		colleccionSistema = self.bd['sistema']
+	    colleccionSistema.find_one_and_update({"_id": "{\"$oid\":\"5bdc0bb9fb6fc074abb59124\"}"},
+                                                              {"$set": {
+                                                                  "notificacionRostros" : False,
+		                                                          "ultimosRostrosReconocidos" : []}})
+		self.puedeNotificarRostros = True
+
 
     def eliminar_fotos(self):
         fotos = glob.glob(ConexionBD.direccionFotos + '*')

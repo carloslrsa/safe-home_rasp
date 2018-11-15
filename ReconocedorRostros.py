@@ -118,6 +118,7 @@ class ReconocedorRostros(object):
                 rostros = self.clasificador_rostro.detectMultiScale(imagen_grises, scaleFactor=1.2, minNeighbors=5, minSize=(50, 50), flags=cv2.CASCADE_SCALE_IMAGE)
 
                 self.rostrosReconocidos = []
+                rostrosReconocidosBufer = []
 
                 for(x, y, w, h) in rostros:
                     label, conf = self.reconocedor.predict(imagen_grises[y : y + h, x : x + w])
@@ -138,11 +139,12 @@ class ReconocedorRostros(object):
                     if encontrado == False:
                         label = 'Desconocido'
 
-                    self.rostrosReconocidos.append([encontrado, label, pin])
+                    rostrosReconocidosBufer.append([encontrado, label, pin])
                     
                     #print self.rostrosReconocidos
 
                     cv2.putText(imagen, label + '--' + str(conf), (x, y + h), self.fuente, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            self.rostrosReconocidos = rostrosReconocidosBufer
             ret_1, jpeg = cv2.imencode('.jpg', imagen)
             self.foto_actual = jpeg.tobytes()
 
