@@ -76,7 +76,7 @@ class ConexionBD(object):
 	        colleccionSistema.find_one_and_update({"_id": sistema['_id']},
 	                                                              {"$set": {
 	                                                                  "notificacionRostros" : True,
-	                                                                  "ultimosRostrosReconocidos" : json.dumps(rostros)}})
+	                                                                  "ultimosRostrosReconocidos" : rostros}})
 
 	        threading.Thread(target = self.rutinaNotificacionRostros, args = (sistema,)).start()
 

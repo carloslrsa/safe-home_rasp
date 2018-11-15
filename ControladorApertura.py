@@ -23,7 +23,7 @@ class ControladorApertura(object):
     def verificarSolicitudLocal(self, rostros):
         #print rostros
         for rostro in rostros:
-            if rostro.pin == self.teclado.Leer():
+            if rostro[2] == self.teclado.Leer():
                 self.cerradura.Abrir()
                 break
     def verificarSolicitudRemota(self):
