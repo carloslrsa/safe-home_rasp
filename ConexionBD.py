@@ -69,20 +69,20 @@ class ConexionBD(object):
     puedeNotificarRostros = True
 
     def NotificarRostrosEncontrados(self, rostros):
-    	if self.puedeNotificarRostros == True:
+    	if self.puedeNotificarRostros == True and len(rostros) > 0:
 	     	colleccionSistema = self.bd['sistema']
 	        colleccionSistema.find_one_and_update({"_id": "{\"$oid\":\"5bdc0bb9fb6fc074abb59124\"}"},
 	                                                              {"$set": {
 	                                                                  "notificacionRostros" : True,
 	                                                                  "ultimosRostrosReconocidos" : rostros}})
-	        threading.Thread(target = rutinaNotificacionRostros).start()
+	        threading.Thread(target = self.rutinaNotificacionRostros).start()
 
-	def rutinaNotificacionRostros(self):
-		self.puedeNotificarRostros = False
-		time.sleep(2)
-		colleccionSistema = self.bd['sistema']
-	    colleccionSistema.find_one_and_update({"_id": "{\"$oid\":\"5bdc0bb9fb6fc074abb59124\"}"},{"$set":{"notificacionRostros" : False,"ultimosRostrosReconocidos":[]}})
-		self.puedeNotificarRostros = True
+    def rutinaNotificacionRostros(self):
+	self.puedeNotificarRostros = False
+	time.sleep(2)
+	colleccionSistema = self.bd['sistema']
+	colleccionSistema.find_one_and_update({"_id": "{\"$oid\":\"5bdc0bb9fb6fc074abb59124\"}"},{"$set":{"notificacionRostros" : False,"ultimosRostrosReconocidos":[]}})
+	self.puedeNotificarRostros = True
 
 
     def eliminar_fotos(self):

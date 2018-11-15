@@ -145,6 +145,8 @@ class ReconocedorRostros(object):
 
                     cv2.putText(imagen, label + '--' + str(conf), (x, y + h), self.fuente, 1, (255, 255, 255), 2, cv2.LINE_AA)
             self.rostrosReconocidos = rostrosReconocidosBufer
+	    print self.rostrosReconocidos
+	    ConexionBD().NotificarRostrosEncontrados(self.rostrosReconocidos)
             ret_1, jpeg = cv2.imencode('.jpg', imagen)
             self.foto_actual = jpeg.tobytes()
 
