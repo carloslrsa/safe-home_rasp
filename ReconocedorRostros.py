@@ -139,8 +139,8 @@ class ReconocedorRostros(object):
                     if encontrado == False:
                         label = 'Desconocido'
 
-                    rostrosReconocidosBufer.append([encontrado, label, pin])
-                    
+                    #rostrosReconocidosBufer.append([encontrado, label, pin])
+                    rostrosReconocidosBufer.append(Rostro(label,encontrado,pin))
                     #print self.rostrosReconocidos
 
                     cv2.putText(imagen, label + '--' + str(conf), (x, y + h), self.fuente, 1, (255, 255, 255), 2, cv2.LINE_AA)
@@ -162,3 +162,16 @@ class ReconocedorRostros(object):
 
     def ObtenerRostros(self):
         return self.rostrosReconocidos
+
+class Rostro():
+    nombre = ""
+    esConocido = False
+    pin = ""
+
+    def __init__(self, nombre, esConocido, pin):
+        self.nombre = nombre
+        self.esConocido = esConocido
+        self.pin = pin
+
+    def __str__(self):
+        return nombre + " " + str(esConocido)
