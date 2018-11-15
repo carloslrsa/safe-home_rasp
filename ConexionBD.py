@@ -50,6 +50,7 @@ class ConexionBD(object):
     		sistema = documento
     		break
 
+	#print 'Id del sistema: ' + str(sistema['_id'])
     	return sistema
 
     def NotificarCambioHabitante(self, sistema, cambio):
@@ -70,18 +71,20 @@ class ConexionBD(object):
 
     def NotificarRostrosEncontrados(self, rostros):
     	if self.puedeNotificarRostros == True and len(rostros) > 0:
+		sistema = self.ObtenerVariablesSistema()
 	     	colleccionSistema = self.bd['sistema']
-	        colleccionSistema.find_one_and_update({"_id": "{\"$oid\":\"5bdc0bb9fb6fc074abb59124\"}"},
+	        colleccionSistema.find_one_and_update({"_id": sistema['_id']},
 	                                                              {"$set": {
 	                                                                  "notificacionRostros" : True,
 	                                                                  "ultimosRostrosReconocidos" : rostros}})
-	        threading.Thread(target = self.rutinaNotificacionRostros).start()
 
-    def rutinaNotificacionRostros(self):
+	        threading.Thread(target = self.rutinaNotificacionRostros, args = (sistema,)).start()
+
+    def rutinaNotificacionRostros(self,sistema):
 	self.puedeNotificarRostros = False
 	time.sleep(2)
 	colleccionSistema = self.bd['sistema']
-	colleccionSistema.find_one_and_update({"_id": "{\"$oid\":\"5bdc0bb9fb6fc074abb59124\"}"},{"$set":{"notificacionRostros" : False,"ultimosRostrosReconocidos":[]}})
+	colleccionSistema.find_one_and_update({"_id": sistema['_id']},{"$set":{"notificacionRostros" : False,"ultimosRostrosReconocidos":[]}})
 	self.puedeNotificarRostros = True
 
 
