@@ -71,6 +71,7 @@ class ConexionBD(object):
 
     def NotificarRostrosEncontrados(self, rostros):
     	if self.puedeNotificarRostros == True and len(rostros) > 0:
+		self.puedeNotificarRostros = False
 		sistema = self.ObtenerVariablesSistema()
 	     	colleccionSistema = self.bd['sistema']
 	        colleccionSistema.find_one_and_update({"_id": sistema['_id']},
@@ -81,8 +82,17 @@ class ConexionBD(object):
 	        threading.Thread(target = self.rutinaNotificacionRostros, args = (sistema,)).start()
 
     def rutinaNotificacionRostros(self,sistema):
-	self.puedeNotificarRostros = False
-	time.sleep(2)
+	
+	#time.sleep(2)
+	prev = time()
+
+	while True:
+		now = time()
+		if now - prev > 2:
+			break
+		else
+			pass
+
 	colleccionSistema = self.bd['sistema']
 	colleccionSistema.find_one_and_update({"_id": sistema['_id']},{"$set":{"notificacionRostros" : False,"ultimosRostrosReconocidos":[]}})
 	self.puedeNotificarRostros = True
